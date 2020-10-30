@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    hostname: minio
+    restart: unless-stopped
+    command: "server /data"
+    volumes:
+      - ../Data/minio:/data
+    environment:
+      - MINIO_ACCESS_KEY=changeme
+      - MINIO_SECRET_KEY=changeme
+    labels:
+      # Traefik Labels
+      - "traefik.enable=true"
+      # HTTPS Labels
+      - "traefik.http.routers.minio.rule=Host(`localhost`)" # Domain Name
+      - "traefik.http.routers.minio.entrypoints=web-secure"
+      - "traefik.http.routers.minio.service=minio"
+      - "traefik.http.routers.minio.tls=true"
+      - "traefik.http.services.minio.loadbalancer.server.port=9000" # Proxied Port
